@@ -3,7 +3,7 @@ import * as React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
-
+import Toast, { BaseToast, ErrorToast } from 'react-native-toast-message';
 import { AppProvider } from './provider/AppProvider';
 //icons
 import { Ionicons } from '@expo/vector-icons';
@@ -17,7 +17,9 @@ const Tab = createBottomTabNavigator();
 import { PantallaHome } from './components/pantallaHome';
 import {PantallaMisRecetas} from './components/pantallaMisRecetas';
 import {PantallaConfiguracion} from './components/pantallaConfiguracion';
-
+import {DetalleReceta} from './components/detalleReceta';
+import { PantallaCargarReceta } from './components/pantallaCargarReceta';
+import { EditarReceta } from './components/editarReceta';
 
 
 
@@ -42,6 +44,13 @@ const StackHome = () => {
         options={{ title: 'Inicio' }}
       />
 
+      
+      <Stack.Screen
+        name="DetalleReceta"
+        component={DetalleReceta}
+        options={{ title: 'Detalle de Receta' }}
+      />  
+
     </Stack.Navigator>
   );
 };
@@ -63,6 +72,26 @@ const StackMisRecetas = () => {
         component={PantallaMisRecetas}
         options={{ title: 'Mis Recetas' }}
       />
+     
+
+      <Stack.Screen
+        name="pantallaCargarReceta"
+        component={PantallaCargarReceta}
+        options={{ title: 'Tu nueva receta' }}
+      />
+
+       <Stack.Screen
+        name="DetalleReceta"
+        component={DetalleReceta}
+        options={{ title: 'Detalle de Receta' }}
+      />  
+
+      <Stack.Screen
+        name="editarReceta"
+        component={EditarReceta}
+        options={{ title: 'Edicion de tu Receta' }}
+      />  
+
     </Stack.Navigator>
   );
 };
@@ -100,7 +129,31 @@ const StackConfiguracion = () => {
 // ---------- APP ----------
 export default function App() {
 
+const toastConfig = {
+  success: (props) => (
+    <BaseToast
+      {...props}
+      style={{ borderLeftColor: 'green', height: 100 }}
+      contentContainerStyle={{ paddingHorizontal: 10 }}
+      text1Style={{
+        fontSize: 18,
+        fontWeight: 'bold',
+      }}
+      text2Style={{
+        fontSize: 15,
+      }}
+    />
+  ),
 
+  error: (props) => (
+    <ErrorToast
+      {...props}
+      style={{ height: 80 }}
+      text1Style={{ fontSize: 18 }}
+      text2Style={{ fontSize: 15 }}
+    />
+  ),
+};
   return (
     <AppProvider>
 
@@ -122,22 +175,21 @@ export default function App() {
       >
 
       
-        <Tab.Screen
-          name="StackHome"
-          component={StackHome} 
-          options={{ title: 'Inicio',
-
-
-
-            tabBarIcon: ({ color, size, focused }) => (
-           <Ionicons
-            name={focused ? 'home' : 'home-outline'}
-            size={size}
-            color={color}
-          />
-          ),
-           }}
-        />
+       <Tab.Screen
+  name="StackHome"
+  component={StackHome} 
+  options={{ 
+    title: 'Inicio',
+    tabBarLabel: 'Inicio',
+    tabBarIcon: ({ color, size, focused }) => (
+      <Ionicons
+        name={focused ? 'home' : 'home-outline'}
+        size={size}
+        color={color}
+      />
+    ),
+  }}
+/>
 
 
 
@@ -147,6 +199,7 @@ export default function App() {
           name="StackMisRecetas"
           component={StackMisRecetas}
           options={{ title: 'Mis Recetas',
+             tabBarLabel: 'Mis Recetas',
             tabBarIcon: ({ color, size, focused }) => (
           <Ionicons
             name={focused ? 'pizza' : 'pizza-outline'}
@@ -166,6 +219,7 @@ export default function App() {
           name="StackConfiguracion"
           component={StackConfiguracion}
           options={{ title: 'Configuración',
+            tabBarLabel: 'Configuración',
             tabBarIcon: ({ color, size, focused }) => (
           <Ionicons
             name={focused ? 'settings' : 'settings-outline'}
@@ -178,13 +232,13 @@ export default function App() {
 
       </Tab.Navigator>
     
-    
+  
     
     </NavigationContainer>
 
     
     
-    
+       <Toast config={toastConfig} />
     </AppProvider>
    
   );

@@ -1,32 +1,50 @@
-import React from 'react';
-import { View, Text, Image, StyleSheet } from 'react-native';
-import { useContext } from 'react';
+import React, { useContext, useState, useMemo } from 'react';
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  ScrollView,
+  TextInput,
+  TouchableOpacity,
+  ImageBackground,
+} from 'react-native';
 import { AppContext } from '../provider/AppProvider';
+import { useEffect } from 'react';
 
+import { useNavigation } from '@react-navigation/native';
+import Toast from 'react-native-toast-message';
+const fondoPantallaHome2="https://res.cloudinary.com/dzul1hatw/image/upload/v1783265518/7973bffd122cde7508ca6ff036f2d361_ngytjz.jpg"
+const fondoPantallaHome3="https://res.cloudinary.com/dzul1hatw/image/upload/v1783266417/94d1773e907d13b8eefabbc9f6d3886b_sttwfp.jpg"
+const fondoPantallaHome="https://res.cloudinary.com/dzul1hatw/image/upload/v1783265576/a22a86261522a0eba143da53278e5075_nnyygl.jpg";
 
-
-//Esto es un componente para representar cada tarjeta de libro
-const Card = ({ nombre, imagenUrl }) => {
-
-
-
-
-
+const Card = ({ nombre, imagenUrl, descripcion, onVerReceta, receta }) => {
   return (
     <View style={styles.card}>
-      <Text style={styles.cardText}>{nombre}</Text>
       <Image
-        style={styles.cardImage}
         source={{ uri: imagenUrl }}
+        style={styles.cardImage}
         resizeMode="cover"
       />
+
+      <View style={styles.cardInfo}>
+        <Text numberOfLines={1} style={styles.cardTitulo}>
+          {nombre}
+        </Text>
+
+        <Text numberOfLines={2} style={styles.cardDescripcion}>
+          {descripcion}
+        </Text>
+
+         <TouchableOpacity onPress={() => onVerReceta(receta)}>
+          <Text style={styles.cardBoton}>
+            Ver receta →
+          </Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
-
-
-
-
 
 
 
@@ -34,37 +52,155 @@ const Card = ({ nombre, imagenUrl }) => {
 
 
 export const PantallaHome = () => {
+  const {
+    usuario,
+    recetas,
+    ultimasBusquedas,
+    setUltimasBusquedas,
+  } = useContext(AppContext);
+
+  const [busqueda, setBusqueda] = useState("");
 
 
-const { usuario, setUsuario, recetas, setRecetas, loading, setLoading } = useContext(AppContext);
+
+ useEffect(() => {
+  if (usuario) {
+    Toast.show({
+      type: 'success',
+      text1: `👋 ¡Hola, ${usuario}!`,
+      text2: '       ¡Es hora de cocinar!',
+      
+    });
+  }
+}, [usuario]);
 
 
+  const recetasFiltradas = useMemo(() => {
+    if (busqueda.trim() === "") return recetas;
+
+    return recetas.filter((receta) =>
+      receta.titulo.toLowerCase().includes(busqueda.toLowerCase())
+    );
+  }, [busqueda, recetas]);
+
+  const navigation = useNavigation();
+
+// vamos a asumir que cuando entra a una receta en ese momento se guarda en el historial de busquedas, y si ya estaba no se repite, y solo se mantiene un maximo de 5 ultimas busquedas
+// y eso lo guardamos en el contexto, y lo mostramos en la pantalla de inicio, y si no hay ultimas busquedas mostramos un mensaje que diga "Todavía no realizaste ninguna búsqueda."
+const verReceta = (receta) => {
+  
+  setUltimasBusquedas((prev) => {
+    const sinDuplicados = prev.filter((r) => r.id !== receta.id);
+
+    return [receta, ...sinDuplicados].slice(0, 5);
+  });
+
+//  navigation.navigate('DetalleReceta', { receta, origen:"general" });
+    navigation.navigate('DetalleReceta', {
+  id: receta.id,
+  origen: 'general',
+});
+};
 
 
   return (
-    <View style={styles.container}>
-      
-       <Text style={styles.texto}>{usuario}</Text>
 
+
+  <ImageBackground
+  source={{ uri: fondoPantallaHome2 }}
+  style={styles.background}
+  imageStyle={{ resizeMode: 'cover', opacity: 0.7  }}
   
-      {
-       recetas.length > 0 ? (
-        recetas.map(
+>
+  {/**/}
+  
+         <ScrollView
+       style={styles.container}
+      contentContainerStyle={{ paddingBottom: 100 }}
+      showsVerticalScrollIndicator={false}
+  
+    >
+    <Text style={styles.nombreUsuario}>
+       {usuario}
+      </Text>
+      
 
-        (receta,index)=>(
-           <Card key={index} nombre={receta.titulo}  imagenUrl={receta.imagen}></Card>
+
+
+ <TextInput
+        style={styles.input}
+        placeholder="Buscar recetas..."
+        value={busqueda}
+        onChangeText={setBusqueda}
+      />
+
+      <Text style={styles.subtitulo}>
+        Últimas búsquedas
+      </Text>
+      
+{
+        ultimasBusquedas.length === 0 ? (
+          <Text style={styles.textoVacio}>
+            Todavía no realizaste ninguna búsqueda.
+          </Text>
+        ) : (
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.listaHorizontal}
+          >
+            {
+              ultimasBusquedas.map((item) => (
+                <Card
+                  key={item.id}
+                  nombre={item.titulo}
+                  imagenUrl={item.imagen}
+                  descripcion={item.descripcion}
+                   receta={item}
+                  onVerReceta={() => verReceta(item)}
+                />
+              ))
+            }
+          </ScrollView>
         )
-        )
-       ):(
+      } 
+     
 
-        <Text style={styles.texto}>No hay recetas disponibles</Text>
-       )
+      <Text style={styles.subtitulo}>
+        {busqueda.trim() === ""
+          ? "Todas las recetas"
+          : "Resultados de búsqueda"}
+      </Text>
 
-      }
 
 
 
-    </View>
+  <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.listaHorizontal}
+      >
+        {
+          recetasFiltradas.map((item) => (
+            <Card
+              key={item.id}
+              nombre={item.titulo}
+              imagenUrl={item.imagen}
+              descripcion={item.descripcion}
+              receta={item}
+              onVerReceta={() => verReceta(item)}
+            />
+          ))
+        }
+      </ScrollView>  
+      
+     
+
+         </ScrollView>
+
+        
+</ImageBackground>
+   
   );
 };
 
@@ -72,34 +208,104 @@ const { usuario, setUsuario, recetas, setRecetas, loading, setLoading } = useCon
 
 
 
-//  styles
+
+
+
+
+
+
 const styles = StyleSheet.create({
+
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    //backgroundColor: '#F5F5F5',
+    paddingTop: 50,
   },
-  texto: {
-    color: 'black',
+
+ background: {
+  flex: 1,
+},
+
+overlay: {
+  flex: 1,
+  backgroundColor: 'rgba(0,0,0,0.35)',
+},
+
+  nombreUsuario: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    //color: '#222',
+    color: '#FFF',
+    marginHorizontal: 20,
+  },
+
+  input: {
+    backgroundColor: '#FFF',
+    marginHorizontal: 20,
+    marginTop: 20,
+    marginBottom: 25,
+    borderRadius: 14,
+    paddingHorizontal: 16,
+    height: 50,
+    fontSize: 16,
+  },
+
+  subtitulo: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    //color: '#222',
+    color: '#FFF',
+    marginHorizontal: 20,
+    marginBottom: 15,
+  },
+
+  listaHorizontal: {
+    paddingHorizontal: 20,
+    paddingBottom: 25,
+  },
+
+  textoVacio: {
+    marginHorizontal: 20,
+    marginBottom: 25,
+    color: '#eb9f14',
+    fontSize: 15,
   },
 
   card: {
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    padding: 10,
-    margin: 10,
-    alignItems: 'center',
-    elevation: 3, // Android
+    width: 220,
+    backgroundColor: '#FFF',
+    borderRadius: 18,
+    overflow: 'hidden',
+    marginRight: 16,
+    elevation: 5,
   },
-  cardText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#000',
-    marginBottom: 10,
-  },
+
   cardImage: {
-    width: 200,
-    height: 150,
-    borderRadius: 8,
+    width: '100%',
+    height: 140,
   },
+
+  cardInfo: {
+    padding: 12,
+  },
+
+  cardTitulo: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#222',
+  },
+
+  cardDescripcion: {
+    marginTop: 6,
+    fontSize: 14,
+    color: '#777',
+  },
+
+  cardBoton: {
+    marginTop: 10,
+    color: '#FF6B35',
+    fontWeight: 'bold',
+    fontSize: 14,
+  },
+
 });
