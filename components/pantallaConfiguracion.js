@@ -96,10 +96,6 @@ export const PantallaConfiguracion = () => {
       <View style={styles.container}>
 
 
-        <Text style={styles.titulo}>
-          Configuración
-        </Text>
-
 
         <TouchableOpacity
           style={styles.opcion}
