@@ -26,12 +26,13 @@ import { EditarReceta } from './components/editarReceta';
 // ---------- STACK HOME ----------
 const StackHome = () => {
 
-
+//'#2d2c30',
+//  borderTopColor: '#E0D6C3',
   return (
     <Stack.Navigator
       screenOptions={{
         headerStyle: {
-          backgroundColor: 'black',
+          backgroundColor: '#2d2c30',
           borderBottomWidth: 1,
           borderBottomColor: '#e6af4a',
         },
@@ -165,12 +166,12 @@ const toastConfig = {
           headerShown: false,
 
           tabBarStyle: {
-            backgroundColor: 'black',
-            borderTopWidth: 1,
-            borderTopColor: '#eee8e88a',
-          },
-          tabBarActiveTintColor: 'white',
-          tabBarInactiveTintColor: 'gray',
+  backgroundColor: '#2d2c30',
+  borderTopColor: '#E0D6C3',
+  borderTopWidth: 1,
+},
+tabBarActiveTintColor: '#E67E22',
+tabBarInactiveTintColor: '#fcfbfb',
         }}
       >
 
