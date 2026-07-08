@@ -18,6 +18,9 @@ const fondoPantallaHome2="https://res.cloudinary.com/dzul1hatw/image/upload/v178
 const fondoPantallaHome3="https://res.cloudinary.com/dzul1hatw/image/upload/v1783266417/94d1773e907d13b8eefabbc9f6d3886b_sttwfp.jpg"
 const fondoPantallaHome="https://res.cloudinary.com/dzul1hatw/image/upload/v1783265576/a22a86261522a0eba143da53278e5075_nnyygl.jpg";
 
+
+
+
 const Card = ({ nombre, imagenUrl, descripcion, onVerReceta, receta }) => {
   return (
     <View style={styles.card}>
@@ -199,7 +202,7 @@ const verReceta = (receta) => {
          </ScrollView>
 
         
-</ImageBackground>
+  </ImageBackground>
    
   );
 };

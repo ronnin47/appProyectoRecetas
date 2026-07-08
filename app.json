@@ -20,10 +20,16 @@
         "foregroundImage": "./assets/splashIcono.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "com.gorda47.Cocinalo"
     },
     "web": {
       "favicon": "./assets/icono.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "1f93bbd9-74ce-44c2-815f-da7214ab3d1a"
+      }
     }
   }
 }
